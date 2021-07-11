@@ -4,94 +4,107 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width= , initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="Styles.css">
-    <title>Impedance Calculator</title>
+    <link rel="stylesheet" type="text/css" href="/Styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Impedance-Calculator</title>
 </head>
 <body>
-    <h1> Calculate Z1 and Z2 </h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12 col-md-10 col-sm-6">
+                <section class="container-fluid" id="sec1">
+                    <h1> Calculate Z1 and Z2 </h1>
+                    <p>This calculator is meant to calculate the chatacteristic impedances of 2 sections of a microstrip.</p>
+                    <p>These values are meant to be placed in a line calculator such as the one provided by QUCS.</p>
+                    <p>The ang_l needed for the line calculations is also provided.</p><br>
+                </section>
+                <hr>
+                <br>
+                <form method="GET">
+                    <label>Frequency 1: </label>
+                    <input type="number" name="f1" id="f1" step="any" min=0><br>
+                    <br>
+                    <label>Frequency 2: </label>
+                    <input type="number" name="f2" id="f2" step="any" min=0><br><br>
+                    <button type="button" onclick="calc(document.getElementById('f1').value, document.getElementById('f2').value)">Calculate</button>
+                    <button type="button" onclick="refreshPage()">Remove old values</button>
+                </form>
+                <br>
+                <div class="text-center">
+                    <img src="images/lineCalc.png" class="img-fluid" alt="line calculation software">
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <p>This calculator is meant to calculate the chatacteristic impedances of 2 sections of a microstrip.</p>
-    <p>These values are meant to be placed in a line calculator such as the one provided by QUCS.</p>
-    <p>The ang_l needed for the line calculations is also provided.</p><br>
-
-    <form method="GET">
-        <label>Frequency 1: </label>
-        <input type="number" name="f1" id="f1" step="any" min=0><br>
-        <br>
-        <label>Frequency 2: </label>
-        <input type="number" name="f2" id="f2" step="any" min=0><br><br>
-        <button type="button" onclick="calc(document.getElementById('f1').value, document.getElementById('f2').value)">Calculate</button>
-        <button type="button" onclick="refreshPage()">Remove old values</button>
-    </form>
-
-    <script>
-        function calc(f1, f2)
-        {
-            var Z0 = 50;
-            var Rl = 100;
-            
-            var f1_new = parseFloat(f1);
-            var f2_new = parseFloat(f2);
-
-            var A = f2_new/f1_new;
-
-            var angleFactor = 2*(1+A);
-            var angleFactor_string = angleFactor.toString();
-            var lambda = "λ";
-            var lengthOfSection = angleFactor_string.concat(lambda);
-
-            var a = Math.PI / (1+A);
-            var b = Math.tan(a);
-            var alpha = Math.pow(b, 2);
-
-            if (alpha === Infinity)
+    <div class="script1">
+        <script>
+            function calc(f1, f2)
             {
-                Z1 = Math.sqrt(Math.sqrt(Math.pow(Z0, 3) * Rl));
+                var Z0 = 50;
+                var Rl = 100;
+                
+                var f1_new = parseFloat(f1);
+                var f2_new = parseFloat(f2);
+    
+                var A = f2_new/f1_new;
+    
+                var angleFactor = 2*(1+A);
+                var angleFactor_string = angleFactor.toString();
+                var lambda = "λ";
+                var lengthOfSection = angleFactor_string.concat(lambda);
+    
+                var a = Math.PI / (1+A);
+                var b = Math.tan(a);
+                var alpha = Math.pow(b, 2);
+    
+                if (alpha === Infinity)
+                {
+                    Z1 = Math.sqrt(Math.sqrt(Math.pow(Z0, 3) * Rl));
+                }
+                else
+                {
+                    var c = (Z0/(2*alpha)) * (Rl-Z0);
+                    var d = Math.pow(c, 2);
+                    var e = Math.pow(Z0, 3) * Rl;
+                    var Z1 = Math.sqrt(c + Math.sqrt(d + e));
+                }
+    
+                var Z2 = (Z0*Rl)/Z1;
+    
+                var angl = 360/ angleFactor; 
+    
+                const text = document.createElement('div');
+                text.innerHTML = 'Z1:';
+                document.body.appendChild(text).setAttribute("align", "center");
+    
+                var x = document.createElement("div");
+                x.textContent = Z1;
+                document.body.appendChild(x).setAttribute("align", "center");
+    
+                const text2 = document.createElement('div');
+                text2.innerHTML = 'Z2:';
+                document.body.appendChild(text2).setAttribute("align", "center");
+    
+                var y = document.createElement("div");
+                y.textContent = Z2;
+                document.body.appendChild(y).setAttribute("align", "center");
+    
+                const text3 = document.createElement('div');
+                text3.innerHTML = 'Ang_l:';
+                document.body.appendChild(text3).setAttribute("align", "center");
+                
+                var z = document.createElement("div");
+                z.textContent = angl;
+                document.body.appendChild(z).setAttribute("align", "center");
             }
-            else
+    
+            function refreshPage()
             {
-                var c = (Z0/(2*alpha)) * (Rl-Z0);
-                var d = Math.pow(c, 2);
-                var e = Math.pow(Z0, 3) * Rl;
-                var Z1 = Math.sqrt(c + Math.sqrt(d + e));
-            }
-
-            var Z2 = (Z0*Rl)/Z1;
-
-            var angl = 360/ angleFactor; 
-
-            const text = document.createElement('div');
-            text.innerHTML = 'Z1:';
-            document.body.appendChild(text);
-
-            var x = document.createElement("div");
-            x.textContent = Z1;
-            document.body.appendChild(x);
-
-            const text2 = document.createElement('div');
-            text2.innerHTML = 'Z2:';
-            document.body.appendChild(text2);
-
-            var y = document.createElement("div");
-            y.textContent = Z2;
-            document.body.appendChild(y);
-
-            const text3 = document.createElement('div');
-            text3.innerHTML = 'Ang_l:';
-            document.body.appendChild(text3);
-            
-            var z = document.createElement("div");
-            z.textContent = angl;
-            document.body.appendChild(z);
-        }
-
-        function refreshPage()
-        {
-        window.location.reload();
-        } 
-    </script>
-    <br>
-    <img src="lineCalc.png" alt="line calculation software">
+            window.location.reload();
+            } 
+        </script>
+    </div>
 
 </body>
 </html>
