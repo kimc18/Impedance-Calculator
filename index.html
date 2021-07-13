@@ -85,6 +85,8 @@
                     var Z1_units = Z1_txt.concat(" Ω");
                     var Z2_txt = Z2.toString();
                     var Z2_units = Z2_txt.concat(" Ω");
+                    var angl_txt = angl.toString();
+                    var angl_units = angl_txt.concat("°");
 
                     var listNode1 = document.createElement("LI");
                     var listNode2 = document.createElement("LI");
@@ -92,7 +94,7 @@
 
                     var textNode1 = document.createTextNode(Z1_units);
                     var textNode2 = document.createTextNode(Z2_units);
-                    var textNode3 = document.createTextNode(angl);
+                    var textNode3 = document.createTextNode(angl_units);
 
                     listNode1.appendChild(textNode1);
                     listNode2.appendChild(textNode2);
