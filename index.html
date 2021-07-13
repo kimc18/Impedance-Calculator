@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width= , initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="Styles.css">
+    <link rel="stylesheet" type="text/css" href="/Styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <title>Impedance-Calculator</title>
 </head>
@@ -13,38 +13,43 @@
         <div class="row">
             <div class="col-lg-12 col-md-10 col-sm-6">
                 <section class="container-fluid" id="sec1">
-                    <h1> Calculate Z1 and Z2 </h1>
-                    <p>This calculator is meant to calculate the chatacteristic impedances of 2 sections of a microstrip.</p>
+                    <h1>Two Stage Microstrip Transformer</h1><br>
+                    <p>This calculator is meant to calculate the chatacteristic impedances of 2 sections of a microstrip, Z1 and Z2.</p>
                     <p>These values are meant to be placed in a line calculator such as the one provided by QUCS.</p>
-                    <p>The ang_l needed for the line calculations is also provided.</p><br>
+                    <p>The electrical length in degrees (ang_l), is also provided for use in line calculation software.</p>
+                    <p>(Based on: https://ieeexplore.ieee.org/document/1193125)</p>
                 </section>
                 <hr>
                 <br>
                 <form method="GET">
                     <label>Frequency 1: </label>
-                    <input type="number" name="f1" id="f1" step="any" min=0><br>
-                    <br>
+                    <input type="number" name="f1" id="f1" step="any" min=0> Hz<br><br>
                     <label>Frequency 2: </label>
-                    <input type="number" name="f2" id="f2" step="any" min=0><br><br>
-                    <button type="button" onclick="calc(document.getElementById('f1').value, document.getElementById('f2').value)">Calculate</button>
+                    <input type="number" name="f2" id="f2" step="any" min=0> Hz<br><br>
+                    <label>Input Resistance, Z0: </label>
+                    <input type="number" name="Z0" id="Z0" step="any" min=0> Ω<br><br>
+                    <label>Load Resistance, Rl: </label>
+                    <input type="number" name="Rl" id="Rl" step="any" min=0> Ω<br><br>
+                    <button type="button" onclick="calc(document.getElementById('f1').value, document.getElementById('f2').value, document.getElementById('Z0').value, document.getElementById('Rl').value)">Calculate</button>
                     <button type="button" onclick="refreshPage()">Remove old values</button>
                 </form>
                 <br>
                 <div class="text-center">
-                    <img src="lineCalc.png" class="img-fluid" alt="line calculation software">
+                    <img src="2SecMicro.jpg" class="img-fluid" alt="2-section_microstipline">
                 </div>
             </div>
         </div>
     </div>
+    <br>
     <hr>
     <ul id="data"></ul>
     <section>
         <div class="container-fluid">
             <script>
-                function calc(f1, f2)
+                function calc(f1, f2, Z0, Rl)
                 {
-                    var Z0 = 50;
-                    var Rl = 100;
+                    var Z0_new = parseFloat(Z0);
+                    var Rl_new = parseFloat(Rl);
                     
                     var f1_new = parseFloat(f1);
                     var f2_new = parseFloat(f2);
@@ -62,26 +67,31 @@
         
                     if (alpha === Infinity)
                     {
-                        Z1 = Math.sqrt(Math.sqrt(Math.pow(Z0, 3) * Rl));
+                        Z1 = Math.sqrt(Math.sqrt(Math.pow(Z0_new, 3) * Rl_new));
                     }
                     else
                     {
-                        var c = (Z0/(2*alpha)) * (Rl-Z0);
+                        var c = (Z0_new/(2*alpha)) * (Rl_new-Z0_new);
                         var d = Math.pow(c, 2);
-                        var e = Math.pow(Z0, 3) * Rl;
+                        var e = Math.pow(Z0_new, 3) * Rl_new;
                         var Z1 = Math.sqrt(c + Math.sqrt(d + e));
                     }
         
-                    var Z2 = (Z0*Rl)/Z1;
+                    var Z2 = (Z0_new*Rl_new)/Z1;
         
                     var angl = 360/ angleFactor; 
+
+                    var Z1_txt = Z1.toString();
+                    var Z1_units = Z1_txt.concat(" Ω");
+                    var Z2_txt = Z2.toString();
+                    var Z2_units = Z2_txt.concat(" Ω");
 
                     var listNode1 = document.createElement("LI");
                     var listNode2 = document.createElement("LI");
                     var listNode3 = document.createElement("LI");
 
-                    var textNode1 = document.createTextNode(Z1);
-                    var textNode2 = document.createTextNode(Z2);
+                    var textNode1 = document.createTextNode(Z1_units);
+                    var textNode2 = document.createTextNode(Z2_units);
                     var textNode3 = document.createTextNode(angl);
 
                     listNode1.appendChild(textNode1);
